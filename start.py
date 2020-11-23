@@ -1,9 +1,9 @@
-# filename = "1848575397.xlsx"
-filename = "123.xlsx"
+filename = "./dop/1848575397.xlsx"
+# filename = "123.xlsx"
 row_titles = 1
 use_title = False
 row_start = 2
-row_end = 11
+row_end = 100
 colum_start = 1
 colum_end = 4
 sheet_name = 'Price 2020-2'
@@ -44,7 +44,7 @@ def createimg(text, filename):
 
 def createimg2(numb, name1, name2):
     # use function for create images
-    fnt1 = ImageFont.truetype('/Library/Fonts/Arial Unicode.ttf', 45)
+
     if(len(name1) > 20 ):
         font_size1 = 20
         name1 = editstring(name1)
@@ -61,8 +61,10 @@ def createimg2(numb, name1, name2):
         font_size2 = 25
         up_name2 = 180
 
+    fnt1 = ImageFont.truetype('/Library/Fonts/Arial Unicode.ttf', 45)
     fnt2 = ImageFont.truetype('/Library/Fonts/Arial Unicode.ttf', font_size1)
     fnt3 = ImageFont.truetype('/Library/Fonts/Arial Unicode.ttf', font_size2)
+    fnt4 = ImageFont.truetype('/Library/Fonts/Arial Unicode.ttf', 25)
 
     #create barcode
     ean = barcode.get('code128', numb, writer=ImageWriter())
@@ -90,13 +92,11 @@ def createimg2(numb, name1, name2):
     img_qr = qr.make_image()
     im_rgba.paste(img_qr, (11,11))
 
-
-
     d = ImageDraw.Draw(im_rgba)
     d.text((440, 80), numb, font=fnt1, fill=(0, 0, 0))
     d.text((380, up_name1), name1, font=fnt2, fill=(0, 0, 0))
-    d.text((380, up_name2), name2, font=fnt2, fill=(0, 0, 0))
-    d.text((380, 275), email, font=fnt2, fill=(0, 0, 0))
+    d.text((380, up_name2), name2, font=fnt3, fill=(0, 0, 0))
+    d.text((380, 275), email, font=fnt4, fill=(0, 0, 0))
     im_rgba.save( img_dir + numb + '.png', optimize=True, quality=25)
 
 
@@ -130,20 +130,8 @@ def main():
     # Get sheet names
     #print(wb.get_sheet_names())
     # Get a sheet by name
-    sheet = wb.get_sheet_by_name(sheet_name)
+    sheet = wb[sheet_name]
 
-    # for i1 in range(row_start, row_end):
-    #     text = ''
-    #     for i2 in range(colum_start, colum_end):
-    #         if(use_title):
-    #             text = text + str(sheet.cell(row=row_titles, column=i2).value)
-    #             text = text + "\n- "
-    #         text = text + str(sheet.cell(row=i1, column=i2).value)
-    #         #print(i1, ' - ', i2, sheet.cell(row=i1, column=i2).value)
-    #         if( i2 < (colum_end - 1) ):
-    #             text = text + ' \n'
-    #     createimg(text, imgprefix+str(i1))
-    #     #print(text)
 
     for i1 in range(row_start, row_end):
         numb = str(sheet.cell(row=i1, column=1).value)
@@ -155,10 +143,3 @@ def main():
 
 #======================================
 main() # start programm
-
-# numb = '1'
-# name1 = 'POWER CABLE 3X 2,5MM² OFFSHORE'
-# # name1 = 'POWER CABLE'
-# name2 = 'SMARTBOX (для Mk5 - исп. п/н 2230050000; для Mk4 - исп. п/н 2230051000)'
-# # name2 = 'SMARTBOX (для Mk5'
-# createimg2(numb, name1, name2)
