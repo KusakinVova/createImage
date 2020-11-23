@@ -10,6 +10,8 @@ sheet_name = 'Price 2020-2'
 imgprefix = 'img_'
 img_dir = './imgs/'
 pretextqr = 'https://barkaris.ru/catalog/?q='
+email = 'email: sale@barkaris.ru'
+
 
 import os
 
@@ -43,8 +45,24 @@ def createimg(text, filename):
 def createimg2(numb, name1, name2):
     # use function for create images
     fnt1 = ImageFont.truetype('/Library/Fonts/Arial Unicode.ttf', 45)
-    fnt2 = ImageFont.truetype('/Library/Fonts/Arial Unicode.ttf', 25)
-    fnt3 = ImageFont.truetype('/Library/Fonts/Arial Unicode.ttf', 25)
+    if(len(name1) > 20 ):
+        font_size1 = 20
+        name1 = editstring(name1)
+        up_name1 = 135
+    else:
+        font_size1 = 25
+        up_name1 = 150
+
+    if(len(name2) > 20 ):
+        font_size2 = 20
+        name2 = editstring(name2)
+        up_name2 = 185
+    else:
+        font_size2 = 25
+        up_name2 = 180
+
+    fnt2 = ImageFont.truetype('/Library/Fonts/Arial Unicode.ttf', font_size1)
+    fnt3 = ImageFont.truetype('/Library/Fonts/Arial Unicode.ttf', font_size2)
 
     #create barcode
     ean = barcode.get('code128', numb, writer=ImageWriter())
@@ -54,9 +72,11 @@ def createimg2(numb, name1, name2):
     #new img
     im_rgba = Image.new('RGB', (800, 333), color=(255, 255, 255))
     im_rgba2 = Image.new('RGB', (790, 323), color=(0, 0, 0))
-    im_rgba3 = Image.new('RGB', (780, 313), color=(255, 255, 255))
+    im_rgba3 = Image.new('RGB', (457, 310), color=(255, 255, 255))
+    im_rgba4 = Image.new('RGB', (457, 6), color=(0, 0, 0))
     im_rgba.paste(im_rgba2, (5, 5))
-    im_rgba.paste(im_rgba3, (10, 10))
+    im_rgba.paste(im_rgba3, (330, 11))
+    im_rgba.paste(im_rgba4, (330, 265))
 
     #add bar code
     img_bar = Image.open(img_dir + 'b_' + numb+'.png')
@@ -71,17 +91,40 @@ def createimg2(numb, name1, name2):
     im_rgba.paste(img_qr, (11,11))
 
 
+
     d = ImageDraw.Draw(im_rgba)
     d.text((440, 80), numb, font=fnt1, fill=(0, 0, 0))
-    d.text((380, 150), name1, font=fnt2, fill=(0, 0, 0))
-    d.text((380, 180), name2, font=fnt2, fill=(0, 0, 0))
+    d.text((380, up_name1), name1, font=fnt2, fill=(0, 0, 0))
+    d.text((380, up_name2), name2, font=fnt2, fill=(0, 0, 0))
+    d.text((380, 275), email, font=fnt2, fill=(0, 0, 0))
     im_rgba.save( img_dir + numb + '.png', optimize=True, quality=25)
 
 
 
 #======================================
+def editstring(oldstring):
+    startpoint = 0
+    endpoint = 38
+    maxlen = 38
+    stop = 0
+    newstring = ''
+    while(stop == 0):
+        index = oldstring.rfind(' ', startpoint, endpoint)
+        newstring = newstring + oldstring[startpoint+1:index]+'\n'
+        endpoint = index + maxlen
+        startpoint = index+1
+        if( (len(oldstring) - startpoint) < maxlen):
+            stop = 1
+            newstring = newstring + oldstring[startpoint:len(oldstring)]
+    return newstring
+#======================================
 
 def main():
+
+    #create dir
+    if(os.path.isdir(img_dir) == False):
+        os.mkdir(img_dir)
+
     # Load in the workbook
     wb = load_workbook('./'+filename)
     # Get sheet names
@@ -112,3 +155,10 @@ def main():
 
 #======================================
 main() # start programm
+
+# numb = '1'
+# name1 = 'POWER CABLE 3X 2,5MM² OFFSHORE'
+# # name1 = 'POWER CABLE'
+# name2 = 'SMARTBOX (для Mk5 - исп. п/н 2230050000; для Mk4 - исп. п/н 2230051000)'
+# # name2 = 'SMARTBOX (для Mk5'
+# createimg2(numb, name1, name2)
